@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOMPUTASIKU | Media Pembelajaran Berpikir Komputasional</title>
+<style>
+/* =========================================================
+   KOMPUTASIKU - CSS
+   Ubah warna utama melalui variabel --primary di bawah ini.
+   ========================================================= */
+:root{--primary:#1F4E9C;--primary-light:#DCE8F7;--bg:#F2F7FC;--ink:#18304f;--muted:#60738b;--green:#218653;--yellow:#fff3c4;--red:#b42318;--white:#fff;--line:#d8e2ee}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.55}
+header{background:var(--primary);color:white;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:1.25rem;letter-spacing:.4px}.brand small{display:block;font-size:.78rem;font-weight:400;opacity:.9}
+header nav{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{border:0;border-radius:9px;padding:11px 16px;background:var(--primary);color:white;font-weight:650;cursor:pointer;font-size: .96rem}
+button:hover,.btn:hover{filter:brightness(1.08)}button:disabled{opacity:.45;cursor:not-allowed}
+header button{background:#fff;color:var(--primary);padding:8px 12px}
+main{max-width:1100px;margin:26px auto;padding:0 18px 48px}
+.card{background:white;border:1px solid var(--line);border-radius:15px;padding:22px;margin:14px 0;box-shadow:0 4px 14px #17365d0a}
+.hero{padding:34px;background:linear-gradient(135deg,#e8f1fc,#fff);border:1px solid #cbdcf0;border-radius:18px}
+h1{font-size:clamp(1.8rem,4vw,2.7rem);line-height:1.15;margin:8px 0;color:var(--primary)}
+h2{color:var(--primary);margin-top:0}h3{margin-bottom:8px}
+.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+label{display:block;font-weight:650;margin:10px 0 5px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #b8c8da;border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+.progress{height:12px;background:#e5edf6;border-radius:20px;overflow:hidden}.progress>div{height:100%;background:var(--green);width:0;transition:width .25s}
+.tile{border:1px solid var(--line);border-radius:12px;padding:17px;background:white;text-align:left;color:var(--ink);width:100%;min-height:125px}
+.tile strong{display:block;color:var(--primary);font-size:1.05rem}.tile.done{border-color:#8bc6a5;background:#effaf3}.tile.locked{background:#eef1f5;color:#7c8795}
+.pill{display:inline-block;border-radius:20px;padding:3px 10px;font-size:.8rem;background:var(--primary-light);color:var(--primary);font-weight:700}
+.notice{background:var(--yellow);padding:13px;border-radius:9px;margin:12px 0}
+.question{border:1px solid var(--line);padding:15px;border-radius:10px;margin:12px 0}
+.option{display:block;padding:9px;border:1px solid var(--line);border-radius:8px;margin:7px 0;cursor:pointer;font-weight:400}
+.option input{width:auto;margin-right:8px}
+.feedback{padding:12px;border-radius:8px;margin-top:10px}.good{background:#e9f7ef;color:#17683d}.bad{background:#fff0ef;color:var(--red)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.secondary{background:#e8eef6;color:var(--primary)}.success{background:var(--green)}.danger{background:#a93226}
+.stepbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.stepbar span{padding:7px 11px;background:#e9eff7;border-radius:20px;font-size:.9rem}.stepbar .active{background:var(--primary);color:#fff}
+table{width:100%;border-collapse:collapse;background:white}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left}th{background:#eaf1fa;color:var(--primary)}
+footer{text-align:center;color:var(--muted);padding:24px}
+.hidden{display:none!important}
+@media(max-width:600px){header{padding:12px}main{margin:16px auto;padding:0 12px 30px}.card{padding:16px}.hero{padding:23px}button{width:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">⌘ KOMPUTASIKU <small>Pecahkan masalah, selangkah demi selangkah.</small></div>
+  <nav><button onclick="goHome()">Beranda</button><button onclick="showTeacherLogin()">Masuk Guru</button></nav>
+</header>
+<main id="app" aria-live="polite"></main>
+<footer>KOMPUTASIKU · Media Pembelajaran Berpikir Komputasional · SMA Negeri 8 Bone</footer>
+
+<script>
+/* =========================================================
+   1. KONFIGURASI APLIKASI
+   Ubah nama sekolah, kelas, kata sandi guru, dan URL Apps Script
+   sesuai kebutuhan. Jangan membagikan kata sandi guru.
+   ========================================================= */
+const CONFIG = {
+  schoolName: "SMA Negeri 8 Bone",
+  appName: "KOMPUTASIKU",
+  teacherPassword: "guru123", // GANTI sebelum digunakan. Ini hanya proteksi sederhana di sisi browser.
+  googleScriptUrl: "" // TEMPEL URL Web App Google Apps Script di sini jika sudah tersedia.
+};
+
+/* =========================================================
+   2. KONTEN PEMBELAJARAN
+   Guru dapat mengubah uraian, analogi, kasus, dan soal pada bagian ini.
+   ========================================================= */
+const foundations = [
+ {name:"Dekomposisi",icon:"🧩",definition:"Dekomposisi adalah cara memecah masalah besar menjadi bagian-bagian kecil agar lebih mudah dipahami dan diselesaikan.",analogy:"Saat menyiapkan kegiatan kelas, kita membaginya menjadi tugas tempat, perlengkapan, konsumsi, dan dokumentasi.",case:"Kelas X akan mengadakan kegiatan kebersihan. Tugas besar tersebut perlu dibagi agar semua pekerjaan tertangani.",prompt:"Mengapa membagi tugas menjadi beberapa bagian dapat membantu menyelesaikan kegiatan?",tasks:["Menentukan alat kebersihan","Membagi kelompok kerja","Menentukan area yang dibersihkan"],feedback:"Tepat. Masalah kegiatan kebersihan diuraikan menjadi beberapa pekerjaan yang lebih kecil.",question:"Ketika merencanakan pentas kelas, tindakan yang menunjukkan dekomposisi adalah ...",options:["Membagi pekerjaan menjadi dekorasi, acara, dan dokumentasi","Mengabaikan semua persiapan","Memilih satu warna poster","Menghafalkan jadwal"],answer:0,explain:"Dekomposisi memecah pekerjaan besar menjadi sub-pekerjaan."},
+ {name:"Pengenalan Pola",icon:"🔎",definition:"Pengenalan pola adalah menemukan kesamaan, keteraturan, atau pengulangan pada data maupun peristiwa.",analogy:"Jika beberapa siswa terlambat pada hari yang sama dan rute yang sama, kita dapat mencari pola penyebab keterlambatan.",case:"Guru melihat catatan keterlambatan. Beberapa siswa terlambat pada hari Senin setelah hujan deras.",prompt:"Informasi apa yang perlu dibandingkan untuk menemukan pola keterlambatan?",tasks:["Hari kejadian","Kondisi cuaca","Waktu dan rute perjalanan"],feedback:"Benar. Membandingkan data membantu menemukan kesamaan dan keteraturan.",question:"Kita menemukan pola ketika ...",options:["Membuang seluruh data","Menemukan kesamaan pada beberapa kejadian","Mengubah nama data","Memilih jawaban secara acak"],answer:1,explain:"Pola ditemukan melalui kesamaan atau pengulangan dalam data."},
+ {name:"Abstraksi",icon:"🎯",definition:"Abstraksi adalah memilih informasi penting yang berkaitan dengan masalah dan mengabaikan detail yang tidak relevan.",analogy:"Saat membaca jadwal pelajaran, kita fokus pada mata pelajaran, hari, jam, dan ruang; warna tas siswa tidak diperlukan.",case:"Kamu ingin mengetahui ruang tempat pelajaran Matematika berlangsung. Jadwal memuat banyak informasi lain.",prompt:"Informasi mana yang paling penting untuk menjawab pertanyaan tentang ruang pelajaran?",tasks:["Nama mata pelajaran","Hari dan jam pelajaran","Nama ruang"],feedback:"Tepat. Abstraksi membantu memusatkan perhatian pada informasi yang relevan.",question:"Saat mencari ruang pelajaran, informasi yang tidak relevan adalah ...",options:["Nama mata pelajaran","Hari pelajaran","Warna sepatu siswa","Nama ruang"],answer:2,explain:"Warna sepatu tidak membantu menentukan ruang pelajaran."},
+ {name:"Algoritma",icon:"⚙️",definition:"Algoritma adalah urutan langkah yang logis, jelas, dan terbatas untuk menyelesaikan suatu masalah.",analogy:"Meminjam buku di perpustakaan mengikuti langkah: mencari buku, mencatat identitas, menyerahkan kartu, lalu menerima buku.",case:"Kamu akan meminjam buku di perpustakaan sekolah. Langkah harus dilakukan secara runtut.",prompt:"Apa akibatnya jika langkah-langkah peminjaman dilakukan secara tidak berurutan?",tasks:["Memilih buku","Menyerahkan kartu anggota","Petugas mencatat peminjaman","Menerima buku"],feedback:"Bagus. Algoritma memastikan setiap langkah dilakukan secara logis dan berurutan.",question:"Contoh algoritma yang benar adalah ...",options:["Melakukan langkah secara acak","Urutan instruksi jelas dari awal sampai akhir","Mengulang tanpa tujuan","Menghilangkan langkah penting"],answer:1,explain:"Algoritma berisi instruksi yang runtut, logis, dan jelas."}
+];
+
+const finalQuestions = [
+ {q:"Apa tujuan utama berpikir komputasional?",o:["Menghafal semua istilah komputer","Menyelesaikan masalah secara sistematis","Menggunakan komputer sepanjang waktu","Menghindari kerja kelompok"],a:1},
+ {q:"Memecah masalah besar menjadi bagian kecil disebut ...",o:["Abstraksi","Algoritma","Dekomposisi","Pengenalan pola"],a:2},
+ {q:"Menemukan kesamaan dari beberapa data merupakan ...",o:["Pengenalan pola","Dekomposisi","Abstraksi","Pengulangan"],a:0},
+ {q:"Memilih informasi yang relevan dan mengabaikan detail lain disebut ...",o:["Algoritma","Abstraksi","Dekomposisi","Simulasi"],a:1},
+ {q:"Urutan langkah logis untuk menyelesaikan masalah disebut ...",o:["Pola","Data","Abstraksi","Algoritma"],a:3},
+ {q:"Saat mengadakan kegiatan kelas, panitia membagi pekerjaan menjadi beberapa tim. Fondasi yang digunakan adalah ...",o:["Dekomposisi","Abstraksi","Pengenalan pola","Enkripsi"],a:0},
+ {q:"Dari catatan cuaca dan keterlambatan, siswa mencari kejadian yang berulang. Ini merupakan ...",o:["Algoritma","Pengenalan pola","Abstraksi","Dekomposisi"],a:1},
+ {q:"Untuk mencari ruang ujian, informasi paling relevan adalah ...",o:["Warna dinding rumah","Merek sepatu","Nomor ruang dan jadwal","Hobi peserta"],a:2},
+ {q:"Langkah pertama menyusun algoritma yang baik adalah ...",o:["Memahami masalah dan tujuan","Menjalankan langkah secara acak","Menghapus semua data","Mengulang tanpa batas"],a:0},
+ {q:"Keempat fondasi berpikir komputasional dapat digunakan untuk ...",o:["Membuat masalah lebih rumit","Menyelesaikan masalah sehari-hari secara terstruktur","Menghindari pengambilan keputusan","Mengganti semua pekerjaan manusia"],a:1}
+];
+
+/* =========================================================
+   3. DATA DAN PENYIMPANAN
+   localStorage menyimpan identitas, progres, dan nilai pada browser.
+   Untuk penggunaan banyak komputer, aktifkan integrasi Google Sheets.
+   ========================================================= */
+const STORE_KEY = "komputasiku_v01";
+let state = loadState();
+let currentFoundation = 0;
+let currentStage = "materi";
+let currentFinalIndex = 0;
+let finalAnswers = {};
+
+function loadState(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||{students:{}}}catch(e){return {students:{}}}}
+function saveState(){localStorage.setItem(STORE_KEY,JSON.stringify(state))}
+function studentKey(){return state.currentStudent||""}
+function currentStudent(){return state.students[studentKey()]}
+function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function setStudent(name,kelas){
+ const key=(name.trim()+"|"+kelas).toLowerCase();
+ state.currentStudent=key;
+ if(!state.students[key])state.students[key]={name:name.trim(),kelas,done:[false,false,false,false],tries:[0,0,0,0],practiceScores:[null,null,null,null],integrated:false,finalScore:null,updated:new Date().toISOString()};
+ saveState();
+}
+
+/* =========================================================
+   4. NAVIGASI DAN TAMPILAN
+   ========================================================= */
+const app=document.getElementById("app");
+function goHome(){
+ app.innerHTML=`
+ <section class="hero">
+  <span class="pill">Media Pembelajaran Koding dan Keterampilan Artifisial · Fase E</span>
+  <h1>Belajar Berpikir Komputasional, Selangkah demi Selangkah</h1>
+  <p>Selamat datang di <b>KOMPUTASIKU</b>. Pelajari cara memecahkan masalah melalui empat fondasi berpikir komputasional.</p>
+  <div class="grid">
+   <div><h3>Tujuan Pembelajaran</h3><ol>
+    <li>Menjelaskan berpikir komputasional dan empat fondasinya.</li>
+    <li>Menerapkan dekomposisi.</li><li>Mengenali pola sederhana.</li>
+    <li>Memilih informasi penting melalui abstraksi.</li><li>Menyusun algoritma logis.</li>
+    <li>Mengintegrasikan empat fondasi untuk menyelesaikan masalah.</li>
+   </ol></div>
+   <div class="card">
+    <h2>Mulai Belajar</h2>
+    <label for="studentName">Nama lengkap</label><input id="studentName" placeholder="Masukkan nama lengkap">
+    <label for="studentClass">Kelas</label><select id="studentClass"><option value="">Pilih kelas</option>${Array.from({length:8},(_,i)=>`<option>X. ${i+1}">X. ${i+1}</option>`).join("")}</select>
+    <div class="actions"><button onclick="startLearning()">Mulai Belajar</button></div>
+    <p class="muted">Identitas digunakan untuk mencatat progres dan hasil belajar pada perangkat ini.</p>
+   </div>
+  </div>
+ </section>
+ <section class="card"><h2>Petunjuk Penggunaan</h2><ol><li>Isi nama dan kelas dengan benar.</li><li>Pelajari setiap fondasi sesuai urutan pada Peta Belajar.</li><li>Baca materi dan studi kasus, kemudian kerjakan latihan interaktif.</li><li>Selesaikan Studi Kasus Terpadu dan Kuis Akhir.</li><li>Lihat hasil belajar dan ekspor CSV jika diperlukan.</li></ol></section>`;
+}
+function startLearning(){
+ const name=document.getElementById("studentName").value.trim(),kelas=document.getElementById("studentClass").value;
+ if(name.length<3||!kelas){alert("Lengkapi nama dan kelas terlebih dahulu.");return}
+ setStudent(name,kelas);showMap();
+}
+function progressPercent(){
+ const s=currentStudent();if(!s)return 0;
+ const count=s.done.filter(Boolean).length+(s.integrated?1:0)+(s.finalScore!==null?1:0);
+ return Math.round(count/6*100);
+}
+function showMap(){
+ const s=currentStudent();if(!s){goHome();return}
+ const cards=foundations.map((f,i)=>{
+  const unlocked=i===0||s.done[i-1],done=s.done[i];
+  return `<button class="tile ${done?"done":!unlocked?"locked":""}" ${unlocked?`onclick="openFoundation(${i})"`:"disabled"}>
+   <strong>${f.icon} Fondasi ${i+1}: ${f.name}</strong><span>${done?"✓ Selesai":unlocked?"Terbuka":"🔒 Terkunci"}</span>
+   <p class="muted">${f.definition.slice(0,86)}...</p></button>`;
+ }).join("");
+ const integratedOpen=s.done.every(Boolean);
+ app.innerHTML=`<section class="card"><h2>Peta Belajar</h2><p>Halo, <b>${escapeHTML(s.name)}</b> · ${escapeHTML(s.kelas)}</p><div class="progress"><div style="width:${progressPercent()}%"></div></div><p class="muted">Progres belajar: ${progressPercent()}%</p>
+ <div class="grid">${cards}
+ <button class="tile ${s.integrated?"done":!integratedOpen?"locked":""}" ${integratedOpen?`onclick="showIntegrated()"`:"disabled"}><strong>🧠 Studi Kasus Terpadu</strong><span>${s.integrated?"✓ Selesai":integratedOpen?"Terbuka":"🔒 Terkunci"}</span><p class="muted">Gunakan keempat fondasi untuk menyelesaikan satu masalah.</p></button>
+ <button class="tile ${s.finalScore!==null?"done":!s.integrated?"locked":""}" ${s.integrated?`onclick="startFinalQuiz()"`:"disabled"}><strong>📝 Kuis Akhir</strong><span>${s.finalScore!==null?"✓ Selesai":s.integrated?"Terbuka":"🔒 Terkunci"}</span><p class="muted">Evaluasi pemahaman dan penerapan konsep.</p></button>
+ </div></section>
+ <div class="actions"><button class="secondary" onclick="goHome()">Kembali ke Beranda</button><button onclick="showResults()">Lihat Hasil</button></div>`;
+}
+function openFoundation(i){currentFoundation=i;currentStage="materi";showFoundation()}
+function showFoundation(){
+ const f=foundations[currentFoundation];
+ const steps=["materi","kasus","latihan"];
+ const stageNames=["Materi","Studi Kasus","Latihan Interaktif"];
+ const stepbar=steps.map((s,i)=>`<span class="${currentStage===s?"active":""}">${i+1}. ${stageNames[i]}</span>`).join("");
+ let content="";
+ if(currentStage==="materi")content=`<h2>${f.icon} ${f.name}</h2><p>${f.definition}</p><div class="notice"><b>Analogi:</b> ${f.analogy}</div><h3>Contoh dalam kehidupan sehari-hari</h3><p>${f.case}</p><div class="notice"><b>Pertanyaan pemantik:</b> ${f.prompt}</div><p class="muted">Pahami konsep sebelum melanjutkan ke studi kasus.</p>`;
+ if(currentStage==="kasus")content=`<h2>Studi Kasus: ${f.name}</h2><p>${f.case}</p><h3>Aktivitas</h3><p>Perhatikan unsur-unsur berikut dan jelaskan bagaimana unsur tersebut berkaitan dengan fondasi ${f.name.toLowerCase()}.</p><ul>${f.tasks.map(t=>`<li>${t}</li>`).join("")}</ul><label for="caseAnswer">Tuliskan pemahaman atau jawabanmu</label><textarea id="caseAnswer" rows="4" placeholder="Tuliskan jawaban dengan bahasamu sendiri..."></textarea>`;
+ if(currentStage==="latihan")content=`<h2>Latihan Interaktif</h2><p>${f.question}</p><div id="practiceOptions">${f.options.map((o,i)=>`<label class="option"><input type="radio" name="practice" value="${i}"> ${o}</label>`).join("")}</div><div id="practiceFeedback"></div><p class="muted">Latihan dapat dicoba kembali. Minimal skor 70% atau sudah mencoba 3 kali untuk membuka fondasi berikutnya.</p>`;
+ app.innerHTML=`<section class="card"><span class="pill">Fondasi ${currentFoundation+1} dari 4</span><h2>${f.name}</h2><div class="stepbar">${stepbar}</div>${content}<div class="actions"><button class="secondary" onclick="showMap()">Peta Belajar</button>${currentStage==="materi"?`<button onclick="currentStage='kasus';showFoundation()">Lanjut ke Studi Kasus</button>`:currentStage==="kasus"?`<button onclick="saveCaseAndContinue()">Simpan & Lanjut ke Latihan</button>`:`<button class="secondary" onclick="retryPractice()">Ulangi</button><button onclick="checkPractice()">Periksa Jawaban</button><button id="nextFoundation" class="success" onclick="finishFoundation()" disabled>Selesaikan Fondasi</button>`}</div></section>`;
+}
+function saveCaseAndContinue(){
+ const answer=document.getElementById("caseAnswer").value.trim();
+ if(answer.length<5){alert("Tuliskan jawaban singkat terlebih dahulu.");return}
+ const s=currentStudent();s["case"+currentFoundation]=answer;saveState();currentStage="latihan";showFoundation();
+}
+function checkPractice(){
+ const chosen=document.querySelector('input[name="practice"]:checked');
+ if(!chosen){alert("Pilih salah satu jawaban.");return}
+ const f=foundations[currentFoundation],s=currentStudent();s.tries[currentFoundation]++;
+ const correct=Number(chosen.value)===f.answer;
+ s.practiceScores[currentFoundation]=correct?100:0;saveState();
+ document.getElementById("practiceFeedback").innerHTML=`<div class="feedback ${correct?"good":"bad"}"><b>${correct?"Benar!":"Belum tepat."}</b> ${f.explain}</div>`;
+ document.getElementById("nextFoundation").disabled=!(correct||s.tries[currentFoundation]>=3);
+}
+function retryPractice(){document.querySelectorAll('input[name="practice"]').forEach(x=>x.checked=false);document.getElementById("practiceFeedback").innerHTML="";document.getElementById("nextFoundation").disabled=true}
+function finishFoundation(){
+ const s=currentStudent();s.done[currentFoundation]=true;s.updated=new Date().toISOString();saveState();
+ if(CONFIG.googleScriptUrl)sendToGoogleSheets("latihan");
+ showMap();
+}
+
+/* =========================================================
+   5. STUDI KASUS TERPADU DAN KUIS AKHIR
+   ========================================================= */
+function showIntegrated(){
+ const s=currentStudent();
+ app.innerHTML=`<section class="card"><span class="pill">Penerapan TP 6</span><h2>Studi Kasus Terpadu: Menyelenggarakan Hari Literasi Sekolah</h2>
+ <p>Sekolah akan mengadakan Hari Literasi. Panitia perlu menyiapkan tempat, memilih kegiatan, mengatur jadwal, dan membagi tugas.</p>
+ <ol><li><b>Dekomposisi:</b> pecah pekerjaan besar menjadi beberapa tugas.</li><li><b>Pengenalan Pola:</b> temukan kesamaan kebutuhan dari kegiatan sebelumnya.</li><li><b>Abstraksi:</b> pilih informasi yang paling penting untuk jadwal.</li><li><b>Algoritma:</b> susun urutan langkah pelaksanaan.</li></ol>
+ <label for="integratedAnswer">Tuliskan jawabanmu untuk keempat fondasi dan algoritma kegiatan (minimal 3 kalimat).</label>
+ <textarea id="integratedAnswer" rows="7" placeholder="1. Dekomposisi: ...&#10;2. Pengenalan Pola: ...&#10;3. Abstraksi: ...&#10;4. Algoritma: ..."></textarea>
+ <div class="actions"><button class="secondary" onclick="showMap()">Kembali</button><button onclick="submitIntegrated()">Kirim Jawaban</button></div></section>`;
+}
+function submitIntegrated(){
+ const val=document.getElementById("integratedAnswer").value.trim();if(val.length<30){alert("Jawaban perlu dikembangkan (minimal 30 karakter).");return}
+ const s=currentStudent();s.integrated=true;s.integratedAnswer=val;s.updated=new Date().toISOString();saveState();if(CONFIG.googleScriptUrl)sendToGoogleSheets("studi kasus terpadu");showMap();
+}
+function startFinalQuiz(){currentFinalIndex=0;finalAnswers={};showFinalQuestion()}
+function showFinalQuestion(){
+ const q=finalQuestions[currentFinalIndex];
+ app.innerHTML=`<section class="card"><h2>Kuis Akhir</h2><p>Soal ${currentFinalIndex+1} dari ${finalQuestions.length}</p><div class="progress"><div style="width:${(currentFinalIndex+1)/finalQuestions.length*100}%"></div></div>
+ <div class="question"><h3>${q.q}</h3>${q.o.map((o,i)=>`<label class="option"><input type="radio" name="final" value="${i}" ${finalAnswers[currentFinalIndex]===i?"checked":""}> ${String.fromCharCode(65+i)}. ${o}</label>`).join("")}</div>
+ <div class="actions"><button class="secondary" onclick="showMap()">Keluar</button><button class="secondary" onclick="previousQuestion()" ${currentFinalIndex===0?"disabled":""}>Sebelumnya</button><button onclick="nextQuestion()">${currentFinalIndex===finalQuestions.length-1?"Kirim Kuis":"Berikutnya"}</button></div></section>`;
+}
+function storeCurrentAnswer(){
+ const c=document.querySelector('input[name="final"]:checked');if(c)finalAnswers[currentFinalIndex]=Number(c.value);
+}
+function previousQuestion(){storeCurrentAnswer();currentFinalIndex--;showFinalQuestion()}
+function nextQuestion(){
+ storeCurrentAnswer();
+ if(finalAnswers[currentFinalIndex]===undefined){alert("Pilih jawaban sebelum melanjutkan.");return}
+ if(currentFinalIndex<finalQuestions.length-1){currentFinalIndex++;showFinalQuestion();return}
+ const score=Math.round(finalQuestions.reduce((n,q,i)=>n+(finalAnswers[i]===q.a?1:0),0)/finalQuestions.length*100);
+ const s=currentStudent();s.finalScore=score;s.finalAnswers=finalAnswers;s.updated=new Date().toISOString();saveState();if(CONFIG.googleScriptUrl)sendToGoogleSheets("kuis akhir");showResults();
+}
+function showResults(){
+ const s=currentStudent();if(!s){goHome();return}
+ const rows=foundations.map((f,i)=>`<tr><td>${f.name}</td><td>${s.done[i]?"Selesai":"Belum selesai"}</td><td>${s.practiceScores[i]===null?"-":s.practiceScores[i]+"%"}</td></tr>`).join("");
+ app.innerHTML=`<section class="card"><span class="pill">Hasil Belajar</span><h2>Terima kasih, ${escapeHTML(s.name)}!</h2><p>Kelas: ${escapeHTML(s.kelas)}</p><div class="grid"><div class="card"><h3>Progres</h3><h2>${progressPercent()}%</h2></div><div class="card"><h3>Nilai Kuis Akhir</h3><h2>${s.finalScore===null?"Belum dikerjakan":s.finalScore}</h2><p>${s.finalScore===null?"":s.finalScore>=75?"Tuntas (acuan minimal 75)":"Perlu penguatan (acuan minimal 75)"}</p></div></div>
+ <h3>Rekap Latihan per Fondasi</h3><table><thead><tr><th>Fondasi</th><th>Status</th><th>Skor latihan</th></tr></thead><tbody>${rows}</tbody></table>
+ <div class="notice">Data saat ini tersimpan pada browser/perangkat yang digunakan. Gunakan Ekspor CSV untuk membuat salinan rekap.</div>
+ <div class="actions"><button onclick="exportCSV()">Ekspor CSV</button><button class="secondary" onclick="showMap()">Peta Belajar</button><button class="secondary" onclick="goHome()">Beranda</button></div></section>`;
+}
+
+/* =========================================================
+   6. EKSPOR CSV DAN GOOGLE SHEETS
+   ========================================================= */
+function exportCSV(){
+ const records=Object.values(state.students);
+ const headers=["Nama","Kelas","Dekomposisi","Pengenalan Pola","Abstraksi","Algoritma","Studi Kasus Terpadu","Nilai Kuis Akhir","Waktu Pembaruan"];
+ const lines=[headers,...records.map(s=>[s.name,s.kelas,...s.done.map((v,i)=>s.practiceScores[i]??(v?"Selesai":"Belum")),s.integrated?"Selesai":"Belum",s.finalScore??"",s.updated])];
+ const csv=lines.map(row=>row.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\r\n");
+ const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob);
+ const a=document.createElement("a");a.href=url;a.download="rekap_komputasiku.csv";a.click();URL.revokeObjectURL(url);
+}
+async function sendToGoogleSheets(activity){
+ // Contoh payload. Apps Script harus menyediakan doPost(e) yang menerima JSON ini.
+ // Jika URL belum diisi, data tetap tersimpan lokal dan dapat diekspor ke CSV.
+ const s=currentStudent();if(!CONFIG.googleScriptUrl||!s)return;
+ try{
+  await fetch(CONFIG.googleScriptUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({activity,name:s.name,kelas:s.kelas,done:s.done,practiceScores:s.practiceScores,integrated:s.integrated,finalScore:s.finalScore,updated:s.updated})});
+ }catch(err){console.warn("Pengiriman ke Google Sheets gagal. Gunakan ekspor CSV.",err)}
+}
+
+/* =========================================================
+   7. HALAMAN GURU (FITUR TAMBAHAN PROTOTIPE)
+   Catatan: password di HTML/JavaScript bukan keamanan produksi.
+   Untuk rilis, gunakan autentikasi sisi server.
+   ========================================================= */
+function showTeacherLogin(){
+ app.innerHTML=`<section class="card" style="max-width:500px;margin:35px auto"><h2>Masuk Guru</h2><p class="muted">Fitur tambahan untuk melihat rekap pada browser ini.</p><label>Kata sandi guru</label><input type="password" id="teacherPass" placeholder="Masukkan kata sandi"><div class="actions"><button onclick="teacherLogin()">Masuk</button><button class="secondary" onclick="goHome()">Kembali</button></div></section>`;
+}
+function teacherLogin(){if(document.getElementById("teacherPass").value!==CONFIG.teacherPassword){alert("Kata sandi tidak sesuai.");return}showTeacherDashboard()}
+function showTeacherDashboard(){
+ const records=Object.values(state.students);
+ const avg=records.filter(s=>s.finalScore!==null).length?Math.round(records.reduce((n,s)=>n+(s.finalScore??0),0)/records.filter(s=>s.finalScore!==null).length):0;
+ const passed=records.filter(s=>s.finalScore!==null&&s.finalScore>=75).length;
+ app.innerHTML=`<section class="card"><h2>Halaman Guru</h2><div class="grid"><div class="card"><h3>Jumlah peserta</h3><h2>${records.length}</h2></div><div class="card"><h3>Rata-rata kuis</h3><h2>${avg}</h2></div><div class="card"><h3>Jumlah tuntas</h3><h2>${passed}</h2></div></div>
+ <div class="actions"><button onclick="exportCSV()">Unduh CSV</button><button class="secondary" onclick="goHome()">Keluar</button></div>
+ <h3>Rekap nilai pada perangkat ini</h3><div style="overflow-x:auto"><table><thead><tr><th>Nama</th><th>Kelas</th><th>F1</th><th>F2</th><th>F3</th><th>F4</th><th>Kuis Akhir</th><th>Status</th></tr></thead><tbody>
+ ${records.map(s=>`<tr><td>${escapeHTML(s.name)}</td><td>${escapeHTML(s.kelas)}</td>${s.practiceScores.map(v=>`<td>${v===null?"-":v+"%"}</td>`).join("")}<td>${s.finalScore??"-"}</td><td>${s.finalScore===null?"Belum":s.finalScore>=75?"Tuntas":"Belum tuntas"}</td></tr>`).join("")||"<tr><td colspan='8'>Belum ada data pada browser ini.</td></tr>"}
+ </tbody></table></div><p class="notice">Rekap ini hanya membaca data browser/perangkat yang sedang digunakan. Untuk rekap seluruh komputer laboratorium, hubungkan Google Sheets melalui Apps Script.</p></section>`;
+}
+
+/* =========================================================
+   8. MULAI APLIKASI
+   ========================================================= */
+goHome();
+</script>
+</body>
+</html>
